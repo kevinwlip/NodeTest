@@ -1,9 +1,16 @@
+
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+var bodyParser = require('body-parser');
+var path = require ('path');
+var querystring = require('querystring');
 
-module.exports = router;
+router.use(bodyParser.urlencoded({ extended: true }));
+
+//now processing post
+router.post('/readNameAndRespond', function(req, res, next) {
+//expecting data variable called name --retrieve value using body-parser
+    var value_name = req.body.name;  //retrieve the data associated with name
+    res.send("hello " + value_name);
+});
