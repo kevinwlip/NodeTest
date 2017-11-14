@@ -2,6 +2,9 @@
   "name": "nodetest",
   "version": "0.0.0",
   "private": true,
+  "engines": {
+    "node": "6.11.4"
+  }
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
