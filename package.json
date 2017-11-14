@@ -2,13 +2,9 @@
   "name": "nodetest",
   "version": "0.0.0",
   "private": true,
-  "engines": {
-    "node": "6.11.4"
-  },
-  "main": "routes/index.js",
   "scripts": {
-    "start": "node index.js"
-  },
+    "start": "node ./bin/www"
+  }
   "dependencies": {
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",
