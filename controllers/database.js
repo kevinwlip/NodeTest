@@ -16,7 +16,7 @@ module.exports.getAllOrders =  function (request, response) {
         if(err) throw err;
 
         //get collection of orders
-        var Orders = db.collection('Orders');
+        var Orders = db.collection('ORDERS');
 
 
         //FIRST showing you one way of making request for ALL orders and cycle through with a forEach loop on returned Cursor
