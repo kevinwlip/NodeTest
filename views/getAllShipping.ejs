@@ -1,0 +1,28 @@
+
+views/getAllShipping.ejs
+<!DOCTYPE html>
+<html>
+<head>
+    <title>mLab MongoDB - getAllShipping</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+<div class="container">
+    <h2>Database Results Getting Shipping</h2>
+    <ul>
+        <% results.forEach(function(r) { %>
+        <li>ID: <%= r._id %></li>
+        <ul>
+            <li>Customer ID: <%= r.CUSTOMER_ID %></li>
+            <li>Shipping Street: <%=r.SHIPPING_STREET %></li>
+            <li>Shipping City: <%=r.SHIPPING_CITY %></li>
+            <li>Shipping State: <%=r.SHIPPING_STATE %></li>
+            <li>Shipping Zip Code: <%=r.SHIPPING_ZIP %></li>
+        </ul>
+        <br/><br/>
+        <% }); %>
+    </ul>
+</div>
+
+</body>
+</html>
