@@ -15,23 +15,33 @@ router.use(upload.array());
 
 module.exports.storeData =  function (request, response) {
 
-    var body = JSON.stringify(req.body); // 'Stringify' convert a value into a JSON string
+    var body = JSON.stringify(req.body); // 'Stringify' converts a value into a JSON string
     var params = JSON.stringify(req.params);
-    var ordertotal = request.body.ordertotal // designates variables for easier use below
-    var quantity = request.body.quantity;
-    var price = request.body.price;
-    var firstname = request.body.firstname;
+
+    // Customers imported data
+    var firstname = request.body.firstname; // designates variables for easier use below
     var lastname = request.body.lastname;
     var street = request.body.street;
     var city = request.body.city;
-    var state = request.body.state
+    var state = request.body.usastate
     var zipcode = request.body.zipcode;
     var email = request.body.email;
-    var product_vector = request.body.products;
-    var creditnumber = request.body.creditnumber;
+
+    // Billing imported data
     var credittype = request.body.credittype;
-    var creditsecuritynumber = request.body.creditsecuritynumber;
+    var creditnumber = request.body.creditnumber;
     var expiryear = request.body.expiryear;
+    var creditsecuritynumber = request.body.creditsecuritynumber;
+
+    // Shipping imported data
+    var shippingstreet = request.body.shippingstreet;
+    var shippingcity = request.body.shippingcity;
+    var shippingstate = request.body.shippingstate;
+    var shippingzip = request.body.shippingzip;
+
+    // Orders imported data
+    var ordertotal = request.body.ordertotal;
+    // var product_vector = request.body.products;
 
     var date = new Date();
     var currentdate = ((date.getMonth() + 1 ) + "-" + date.getDate() + "-" + date.getFullYear());
@@ -104,7 +114,7 @@ module.exports.storeData =  function (request, response) {
 
         // The orders document
         var orderInfo = {
-            _id: ordersID,
+            _id: orderID,
             CUSTOMER_ID: customerID,
             BILLING_ID: billingID,
             SHIPPING_ID: shippingID,
