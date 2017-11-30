@@ -9,9 +9,9 @@ var bodyParser = require('body-parser'); // Module for handling POST, extracts b
 var path = require('path');
 var querystring = require('querystring');
 
-router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({extended: true}));
-router.use(upload.array());
+router.use(bodyParser.json()); // For parsing json
+router.use(bodyParser.urlencoded({extended: true})); // For parsing urlencoded
+router.use(upload.array()); // For uploading an array of files
 
 module.exports.storeData =  function (request, response, next) {
 

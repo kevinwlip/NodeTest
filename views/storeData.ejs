@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Order Summary</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/headfootboot.css" rel="stylesheet">
+    <link href="css/cart.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="./homepage.html">GadgeTech</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="./homepage.html">Home
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="./productspage.html">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="./cart.php">Cart</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Product Form -->
+<?php
+
+	$verbose = true; //set to false to get rid of additional print outs
+
+
+
+	//========================================
+	// Class item = represents a product that is a item is in shopping basket
+	class item {
+	  var $code; // code
+	  var $name; // name
+	  var $quantity; // quantity
+	  var $price; // price per item
+	  var $details; // details
+
+	  function item($code, $name, $quantity, $price, $details) {
+		$this->code = $code;
+$this->name = $name;
+$this->quantity = $quantity;
+$this->price = $price;
+$this->details = $details;
+}
+}
+
+//========================================
+// Class basket = represents shopping basket with the variable $session_basket representing the Array of item instances in basket
+
+/**
+* shopping basket class
+*/
+class basket {
+
+/**
+* constructor
+*/
+function basket() {
+$this->sessionStart();
+}
+
+/**
+* start session OR if one already created retrieve shopping_basket
+*/
+function sessionStart() {
+global $session_basket;      //global variable ---array of items in basket
+
+//start session or retrieve if already exists with client
+session_start();
+
+if($verbose) //verbose printout --not necessary
+echo "session id ". session_id() . "<br>";
+
+//if previouisly started grab data associated with session_basket
+if(isset($_SESSION['session_basket']))
+{
+$session_basket = $_SESSION['session_basket'];
+if($verbose) //verbose printout --not necessary
+{      echo "retrieved session basket is: ";
+print_r($session_basket);
+echo"<br>"; }
+}
+else
+{      //if no session_basket initially to empty array
+$session_basket = Array();
+
+//store in SESSION variables
+$_SESSION['session_basket'] = $session_basket;
+
+if($verbose) //verbose printout --not necessary
+echo "session basket NEW";
+}
+}
+
+
+
+/**
+* destory session -- call when someone wants to completely CLEAR the cart --get rid of session
+*/
+function sessionEnd() {
+session_unset();
+session_destroy();
+}
+
+
+/**
+*determine the number of elements in basket
+*/
+function basketSize() {
+global $session_basket;
+
+// make session if not found
+if ($session_basket == "") {
+$this->sessionStart();
+}
+
+if (! is_array($session_basket)) {
+return 0;
+}
+return $i;
+}
+
+/**
+* register item in session
+* if same code exist in session, modify it.
+*/
+function registerItem($code, $name, $quantity, $price, $details) {
+global $session_basket;
+
+// make session if not found
+if ($session_basket == "") {
+$this->sessionStart();
+}
+
+// test to see if this product (with id $code) is currently IN basket, if so EDIT IT (update)
+if (! $this->editItem($code, $name, $quantity, $price, $details)) {
+$item = new item($code, $name, $quantity, $price, $details); //if NOT in basket CREATE IT
+$session_basket[] = $item;
+}
+
+
+
+//Make sure to add updated $session_basket array to the SESSION variables
+
+$_SESSION['session_basket'] = $session_basket;
+}
+
+
+
+/**
+* see if product (with product id $code) is in the current $session_basket array
+* if exist, modify it and return true
+* else retrun false
+*/
+function editItem($code, $name, $quantity, $price, $details) {
+global $session_basket;
+
+// make session if not found
+if ($session_basket == "") {
+$this->sessionStart();
+return false;
+}
+
+reset($session_basket);
+while(list($k, $v) = each($session_basket)) { //search in $session_basket
+if ($session_basket[$k]->code == $code) { //if found matching code (product id)
+// Found same code --- upade with new values the item
+$session_basket[$k]->name == $name;
+$session_basket[$k]->quantity = $quantity;
+$session_basket[$k]->price = $price;
+
+if($verbose) //verbose printout --not necessary
+echo "INSIDE editItem: " . $code . "<br>";
+
+return true; //return true we updated it
+}
+}
+
+return false; //could not find the product currently in basket
+}
+
+
+
+/**
+* delete item from basket ($session_basket array) that has product id of $code and name of $name
+*/
+function deleteItem($code, $name) {
+global $session_basket;
+
+// make session if not found
+if ($session_basket == "") {
+$this->sessionStart();
+}
+
+reset($session_basket);
+while(list($k, $v) = each($session_basket)) { //look through each item in basket
+if ($session_basket[$k]->code == $code) { //if this item's code matches $code then we found the one to remove
+unset($session_basket[$k]); // remove this item from the $session_basket array
+return true;
+}
+}
+}
+}
+
+
+
+
+
+// STEP 1: Create or Retrive shopping basket if it already is in session
+$basket = new basket();
+
+
+// STEP 2 YOU will need to ALTER THIS CODE IN THE FOLLOWING WAYS:
+// 1) Pass a parameter to the code when invoked telling it if you are "adding" (to basket), "deleting" (from basket), "clearing"
+// entire basket.
+// 2) Call this parameter "Desired_Action" and test for it. THE CODE BELOW is ONLY the code for adding/updating the basket
+// a) Desired_Action = Adding/Updating
+// then read in product information passed to this program from a form called "Add to Cart" to create an item and
+// then call $basket->registerItem(***) see below
+// b) Desired_Action = Deleting
+// then read in the product id into variable $code and product name into variable $name of the item you want to
+// delete from the basket. You get this information from the form that invokes this method passing. Then
+// call $basket->deleteItem($code,$name);
+// c) Desired_Action = Clear
+// simply call $basket->sessionEnd();
+
+
+if($_POST['Desired_Action'] == "Adding") //add and update case
+{
+
+//read in form data
+
+$code = $_POST['code'];
+$name = $_POST['name'];
+$quantity = $_POST['quantity'];
+$price = $_POST['price'];
+$details = $_POST['details'];
+
+//add it to the basket
+$basket->registerItem($code, $name, $quantity, $price, $details);
+
+}
+else if($_POST['Desired_Action'] == "Deleting") //remove from cart case
+{
+
+$basket->deleteItem($_POST['code'], $_POST['name']);
+}
+
+
+
+/*METHOD 1:print out basket (minimal formatting here you will need MORE)
+reset($session_basket);
+$i=0;
+print("<table border=\"2\"><tr><td>Item#</td><td>Product ID</td><td>Product Name</td> <td> Quantity </td> <td>Price/item</td> <td>Cost</td></tr>\n");
+    while(list($k, $v) = each($session_basket)) {
+    $i++;
+    $item = $session_basket[$k];
+    echo "<tr>";
+        echo "<td>" . $i .")</td>" ;
+        echo " <td>". $item->code . "</td>";
+        echo " <td>". $item->name . "</td>";
+        echo " <td>". $item->quantity . "</td>";
+        echo " <td>$". $item->price . "</td>";
+        echo " <td>$". ($item->price*$item->quantity) . "</td>";
+        echo "</tr>";
+
+    }
+    */
+    ?>
+
+    <?php
+
+if (isset($_POST['paymentsubmit'])) {
+	$_SESSION['creditname'] = $_POST['creditname'];
+	$_SESSION['credittype'] = $_POST['credittype'];
+	$_SESSION['creditnumber'] = $_POST['creditnumber'];
+	$_SESSION['creditsecuritynumber'] = $_POST['creditsecuritynumber'];
+	$_SESSION['expiryear'] = $_POST['expiryear'];
+ }
+
+?>
+
+    <?php
+
+require_once 'HTTP/Request2.php';
+
+$request = new HTTP_Request2('https://nodetest-ev6288.herokuapp.com/storeData/');
+
+$request->setMethod(HTTP_Request2::METHOD_POST)
+
+    // For Customer
+    ->addPostParameter('firstname', $_SESSION['firstname'])
+    ->addPostParameter('lastname', $_SESSION['lastname'])
+    ->addPostParameter('street', $_SESSION['street'])
+    ->addPostParameter('city', $_SESSION['city'])
+    ->addPostParameter('usastate', $_SESSION['usastate'])
+    ->addPostParameter('zipcode', $_SESSION['zipcode'])
+    ->addPostParameter('email', $_SESSION['email'])
+
+    // For Billing
+    ->addPostParameter('credittype', $_SESSION['credittype'])
+    ->addPostParameter('creditnumber', $_SESSION['creditnumber'])
+    ->addPostParameter('expiryear', $_SESSION['expiryear'])
+    ->addPostParameter('creditsecuritynumber', $_SESSION['creditsecuritynumber'])
+
+    // For Shipping
+    ->addPostParameter('shippingstreet', $_SESSION['shippingstreet'])
+    ->addPostParameter('shippingcity', $_SESSION['shippingcity'])
+    ->addPostParameter('shippingstate', $_SESSION['shippingstate'])
+    ->addPostParameter('shippingzip', $_SESSION['shippingzip']);
+
+    // ######### To Fix the SSL issue ###########
+    $request->setConfig(array(
+    'ssl_verify_peer'   => FALSE,
+    'ssl_verify_host'   => FALSE
+    ));
+    // ########################################
+
+    //invoke request and get the response
+    try {
+    $response = $request->send();
+    if (200 == $response->getStatus()) {
+    echo "Order Successful";
+    } else {
+    echo 'Order NOT Successful: ' . $response->getStatus() . ' ' .
+    $response->getReasonPhrase();
+    }
+    } catch (HTTP_Request2_Exception $e) {
+    echo 'Error: ' . $e->getMessage();
+    }
+    ?>
+
+    <h2>Order Summary</h2>
+
+    <table>
+        <tr>
+            <th width="8%">Item #</th>
+            <th width="34%">Item</th>
+            <th width="34%">Details</th>
+            <th width="8%">Quantity</th>
+            <th width="8%">Price</th>
+            <th width="8%">Cost</th>
+        </tr>
+        <?php
+		  reset($session_basket);
+		  $i=0;
+		  while(list($k, $v) = each($session_basket)) {
+			$i++;
+			$item = $session_basket[$k];
+			$image = "http://csweb01.csueastbay.edu/~ev6288/Project1/ProductImages/" . $item->code . ".jpg";
+
+        ?>
+        <tr>
+            <td class="column1"><?php echo $i . "." ; ?> </td>
+            <td class="column2"><img src="<?php echo $image; ?>"> <br /> <?php echo $item->name; ?> <br /> Item Code: <?php echo $item->code; ?> </td>
+            <td class="column3"><?php echo $item->details; ?> </td>
+            <td class="column4"><?php echo $item->quantity; ?> </td>
+            <td class="column5"><?php echo "$" . $item->price; ?> </td>
+            <td class="column6"><?php echo "$" . number_format((float)($item->price*$item->quantity), 2, '.', ','); ?> </td>
+        </tr>
+
+        <?php
+			$total = 0;
+			foreach ($_SESSION['session_basket'] as $item){
+			  $total = $total + ($item->price*$item->quantity);
+        }
+        } //end of loop
+        ?>
+    </table>
+
+    <div class="finally">
+
+        <br /><br />
+        <center>
+            <div class="container">
+                <h2>Personal Information from storeData</h2>
+                <ul>
+                    <% results.forEach(function(r) { %>
+                    <li>ID: <%= r._id %></li>
+                    <ul>
+                        <li>First Name: <%= r.FIRSTNAME %></li>
+                        <li>Last Name: <%=r.LASTNAME %></li>
+                        <li>Street: <%=r.STREET %></li>
+                        <li>City: <%=r.CITY %></li>
+                        <li>State: <%=r.STATE %></li>
+                        <li>Zip Code: <%=r.ZIP %></li>
+                        <li>Email: <%=r.EMAIL %></li>
+                    </ul>
+                    <br/><br/>
+
+                    <li>ID: <%= r._id %></li>
+                    <ul>
+                        <li>Customer ID: <%= r.CUSTOMER_ID %></li>
+                        <li>Credit Card Type: <%=r.CREDITCARDTYPE %></li>
+                        <li>Credit Card Number: <%=r.CREDITCARDNUM %></li>
+                        <li>Credit Card Security Number: <%=r.CREDITCARDEXP %></li>
+                        <li>Expiration Year: <%=r.CREDITCARDSECURITYNUM %></li>
+                    </ul>
+                    <br/><br/>
+
+                    <li>ID: <%= r._id %></li>
+                    <ul>
+                        <li>Customer ID: <%= r.CUSTOMER_ID %></li>
+                        <li>Shipping Street: <%=r.SHIPPING_STREET %></li>
+                        <li>Shipping City: <%=r.SHIPPING_CITY %></li>
+                        <li>Shipping State: <%=r.SHIPPING_STATE %></li>
+                        <li>Shipping Zip: <%=r.SHIPPING_ZIP %></li>
+                    </ul>
+                    <br/><br/>
+
+                    <li>ID: <%= r._id %></li>
+                    <ul>
+                        <li>Customer ID: <%= r.CUSTOMER_ID %></li>
+                        <li>Billing ID: <%=r.BILLING_ID %></li>
+                        <li>Shipping ID: <%=r.SHIPPING_ID %></li>
+                        <li>Date: <%=r.DATE %></li>
+                        <li>Product Vector: <%=r.PRODUCT_VECTOR %></li>
+                        <li>Order Total: <%=r.ORDER_TOTAL %></li>
+                    </ul>
+                    <br/><br/>
+                    <% }); %>
+                </ul>
+            </div>
+
+            <?php echo "Personal Information"; ?><br />
+            <?php echo "=============================="; ?><br />
+            <?php echo "First Name: " . $_SESSION['firstname']; ?><br />
+            <?php echo "Last Name: " . $_SESSION['lastname']; ?><br />
+            <?php echo "Street Address: " . $_SESSION['street']; ?><br />
+            <?php echo "City: " . $_SESSION['city']; ?><br />
+            <?php echo "State: " . $_SESSION['usastate']; ?><br />
+            <?php echo "Zip Code: " . $_SESSION['zipcode']; ?><br />
+            <?php echo "Email: " . $_SESSION['email']; ?><br />
+            <?php echo "Phone: " . $_SESSION['phone']; ?><br />
+            <?php echo "Shipping Street: " . $_SESSION['shippingstreet']; ?><br />
+            <?php echo "Shipping City: " . $_SESSION['shippingcity']; ?><br />
+            <?php echo "Shipping State: " . $_SESSION['shippingstate']; ?><br />
+            <?php echo "Shipping Zip Code: " . $_SESSION['shippingzip']; ?><br />
+            <?php echo "Shipping: $" . $_SESSION['shipping'] . " &nbsp; *added to your total*"; ?><br />
+
+            <br />
+            <br />
+
+            <?php echo "Payment Information"; ?><br />
+            <?php echo "============================="; ?><br />
+            <?php echo "Name on Credit Card: " . $_SESSION['creditname']; ?><br />
+            <?php echo "Credit Card Type: " . $_SESSION['credittype']; ?><br />
+            <?php echo "Credit Card Number: " . $_SESSION['creditnumber']; ?><br />
+            <?php echo "Credit Card Security Number: " . $_SESSION['creditsecuritynumber']; ?><br />
+            <?php echo "Expiration Year: " . $_SESSION['expiryear']; ?><br /><br />
+        </center>
+
+    </div>
+
+    <?php $total = $total + $_SESSION['shipping']; ?>
+    <?php $_SESSION['ordertotal'] = $total ; ?>
+    <?php
+			  $request->setMethod(HTTP_Request2::METHOD_POST)
+    ->addPostParameter('ordertotal', $_SESSION['ordertotal']);
+    ?>
+    <h2><center>Thank you for your order!</center></h2>
+    <h2><center><?php echo "Your Total: $" . number_format((float)$total, 2, '.', ','); ?></center></h2>
+
+    <?php session_destroy(); ?>
+
+</body>
+
+<!-- Footer -->
+<footer class="py-4 bg-dark fixed-bottom">
+    <div class="container">
+        <p class="m-0 text-center text-white">Copyright &copy; 2017 GadgeTech Inc. All Rights Reserved.</p>
+    </div>
+    <!-- /.container -->
+</footer>
+
+<!-- Bootstrap core JavaScript -->
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/popper/popper.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+
+</html>
+
+
+views/storeData.ejs
+<!DOCTYPE html>
+<html>
+<head>
+    <title>mLab MongoDB - sto</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+<div class="container">
+    <h2>Database Results storeData</h2>
+    <ul>
+        <% results.forEach(function(r) { %>
+        <li>ID: <%= r._id %></li>
+        <ul>
+            <li>Customer ID: <%= r.CUSTOMER_ID %></li>
+            <li>Billing ID: <%=r.BILLING_ID %></li>
+            <li>Shipping ID: <%=r.SHIPPING_ID %></li>
+            <li>Date ID: <%=r.DATE %></li>
+            <li>Product Vector: <%=r.PRODUCT_VECTOR %></li>
+            <li>Order Total: <%=r.ORDER_TOTAL %></li>
+        </ul>
+        <br/><br/>
+        <% }); %>
+    </ul>
+</div>
+
+</body>
+</html>
