@@ -78,6 +78,8 @@ module.exports.storeData =  function (request, response, next) {
         // Inserts customer information into the collection
         Customers.insertOne(customerInfo, function (err, result) {
             if (err) throw err; // reports an error
+
+            response.render('storeData', {results: docs}); // renders on storeData.ejs
         });
 
 
@@ -94,6 +96,8 @@ module.exports.storeData =  function (request, response, next) {
         // Inserts billing information into the collection
         Billing.insertOne(billingInfo, function (err, result) {
             if (err) throw err; // reports an error
+
+            response.render('storeData', {results: docs}); // renders on storeData.ejs
         });
 
 
@@ -110,6 +114,8 @@ module.exports.storeData =  function (request, response, next) {
         // Inserts shipping information into the collection
         Shipping.insertOne(shippingInfo, function (err, result) {
             if (err) throw err; // reports an error
+
+            response.render('storeData', {results: docs}); // renders on storeData.ejs
         });
 
         // The orders document
@@ -126,8 +132,10 @@ module.exports.storeData =  function (request, response, next) {
         // Inserts order information into the collection
         Orders.insertOne(orderInfo, function (err, result) {
             if (err) throw err; // reports an error
-        });
 
+            response.render('storeData', {results: docs}); // renders on storeData.ejs
+        });
+        
         // Close the database connection when the app terminates
         db.close(function (err) {
             if (err) throw err; // reports an error
