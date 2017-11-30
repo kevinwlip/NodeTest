@@ -42,16 +42,17 @@ module.exports.storeData =  function (request, response) {
         if (err) throw err;
 
         // To Generate a Random ID
-        var billingID = Math.floor((Math.random() * 1000000000000) + 1);
         var customerID = Math.floor((Math.random() * 1000000000000) + 1);
-        var orderID = Math.floor((Math.random() * 1000000000000) + 1);
+        var billingID = Math.floor((Math.random() * 1000000000000) + 1);
         var shippingID = Math.floor((Math.random() * 1000000000000) + 1);
+        var orderID = Math.floor((Math.random() * 1000000000000) + 1);
 
-        //Get Collections
+
+        // Get the MongoDB Collections
         var Customers = db.collection('CUSTOMERS');
         var Billing = db.collection('BILLING');
-        var Orders = db.collection('ORDERS');
         var Shipping = db.collection('SHIPPING');
+        var Orders = db.collection('ORDERS');
 
 
         // The customer document
@@ -83,7 +84,7 @@ module.exports.storeData =  function (request, response) {
         };
 
         Billing.insertOne(billingInfo, function (err, result) {
-            if (err) throw err;
+            if (err) throw err; // reports an error
         });
 
 
@@ -121,6 +122,7 @@ module.exports.storeData =  function (request, response) {
         // Close the database connection when the app terminates
         db.close(function (err) {
             if (err) throw err; // reports an error
+            respond.send("Testing")
         });
     });//end of connect
 };//end function
