@@ -16,10 +16,8 @@ router.use(upload.array());
 module.exports.storeData =  function (request, response) {
 
     var body = JSON.stringify(req.body); // 'Stringify' convert a value into a JSON string
-    //var params = JSON.stringify(req.params);
-    var orderTotal = request.body.order // designates variables for easier use below
-    var code = request.body.code;
-    var name = request.body.name;
+    var params = JSON.stringify(req.params);
+    var ordertotal = request.body.ordertotal // designates variables for easier use below
     var quantity = request.body.quantity;
     var price = request.body.price;
     var firstname = request.body.firstname;
@@ -83,6 +81,7 @@ module.exports.storeData =  function (request, response) {
             CREDITCARDSECURITYNUM: creditsecuritynumber
         };
 
+        // Inserts billing information into the collection
         Billing.insertOne(billingInfo, function (err, result) {
             if (err) throw err; // reports an error
         });
@@ -92,10 +91,10 @@ module.exports.storeData =  function (request, response) {
         var shippingInfo = {
             _id: shippingID,
             CUSTOMER_ID: customerID,
-            SHIPPING_STREET: street,
-            SHIPPING_CITY: city,
-            SHIPPING_STATE: state,
-            SHIPPING_ZIP: zipcode
+            SHIPPING_STREET: shippingstreet,
+            SHIPPING_CITY: shippingcity,
+            SHIPPING_STATE: shippingstate,
+            SHIPPING_ZIP: shippingzip
         };
 
         // Inserts shipping information into the collection
@@ -111,7 +110,7 @@ module.exports.storeData =  function (request, response) {
             SHIPPING_ID: shippingID,
             DATE: currentdate,
             //PRODUCT_VECTOR: {code, name, quantity, price},
-            ORDER_TOTAL: orderTotal
+            ORDER_TOTAL: ordertotal
         };
 
         // Inserts order information into the collection
