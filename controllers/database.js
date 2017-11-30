@@ -13,7 +13,7 @@ router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({extended: true}));
 router.use(upload.array());
 
-module.exports.storeData =  function (request, response) {
+module.exports.storeData =  function (request, response, next) {
 
     var body = JSON.stringify(req.body); // 'Stringify' converts a value into a JSON string
     var params = JSON.stringify(req.params);
@@ -131,7 +131,7 @@ module.exports.storeData =  function (request, response) {
         // Close the database connection when the app terminates
         db.close(function (err) {
             if (err) throw err; // reports an error
-            respond.send("Testing")
+            respond.send("Testing");
         });
     });//end of connect
 };//end function
