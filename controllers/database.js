@@ -23,7 +23,7 @@ module.exports.storeData =  function (request, response) {
     var lastname = request.body.lastname;
     var street = request.body.street;
     var city = request.body.city;
-    var state = request.body.usastate
+    var state = request.body.usastate;
     var zipcode = request.body.zipcode;
     var email = request.body.email;
 
