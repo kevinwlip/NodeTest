@@ -1,28 +1,22 @@
 
-var express = require('express');
-var router = express.Router();
-var mongodb = require('mongodb');
-var mongoDBURI = process.env.MONGODB_URI || 'mongodb://agentkip:password3@ds259245.mlab.com:59245/heroku_w56bp7lk';
+var express = require('express'); // Include the Express JS module
+var router = express.Router(); // route handler for GET, POST, and similar methods
+var mongodb = require('mongodb'); // Include MongoDB module
+var mongoDBURI = process.env.MONGODB_URI || 'mongodb://agentkip:password3@ds259245.mlab.com:59245/heroku_w56bp7lk'; // For MongoDB connection
+var multer = require('multer'); // Node JS middleware for handling multipart/form-data, for uploading files
+var upload = multer();
+var bodyParser = require('body-parser'); // Module for handling POST, extracts body portion of an incoming request
+var path = require('path'); // Modulre for path manipulation of directories and files, strips duplicate slashes
+var querystring = require('querystring'); // Module for parsing and formatting URL query strings
 
-var bodyParser = require('body-parser');
-var path = require('path');
-var querystring = require('querystring');
-router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({extended: true}));
+router.use(bodyParser.json()); // For parsing json
+router.use(bodyParser.urlencoded({extended: true})); // For parsing urlencoded
+router.use(upload.array()); // For uploading an array of files
 
 //LOAD the various controllers
-//var controllerMain = require('../controllers/main');   //this will load the main controller file
 var controllerMongoCollection = require('../controllers/database'); //load controller code dealing with database mongodb and Orders collection
 
-
-router.post('/', function (request, response) {
-    console.log(req.body);
-    var body = JSON.stringify(req.body);
-    var params = JSON.stringify(req.params);
-
-});//end router.post
-
-//CODE to route /storeData to appropriate  Controller function
+//CODE to route /storeData to appropriate Controller function
 //*
 //* mongodb get all of the Orders in Orders collection
 //      and Render information with an ejs view
